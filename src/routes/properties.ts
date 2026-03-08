@@ -32,11 +32,11 @@ router.post('/upload-photos', requireAuth, uploadMultiple, async (req, res) => {
     }
 
     const files = req.files as Express.Multer.File[];
-    
-    // Generate URLs for the uploaded files
+
+    // Convert buffers to base64 data URLs (serverless-compatible)
     const photoUrls = files.map((file) => {
-      // Return relative path that can be served statically
-      return `/photos/${file.filename}`;
+      const base64 = file.buffer.toString('base64');
+      return `data:${file.mimetype};base64,${base64}`;
     });
 
     return res.status(200).json({
