@@ -4,3 +4,4 @@ dist/
 photos/
 .env.local
 *.log
+.vercel
