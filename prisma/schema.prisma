@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url = env("DATABASE_URL")
+
+}
+
+model Property {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId       String
+  propertyType  String   // pg, hostel, flat, room
+  name          String
+  address       String
+  city          String
+  area          String
+  nearbyCollege String?
+  gender        String?  // male, female, unisex
+  occupancyType String?  // single, double, triple, multiple
+  totalBeds     Int
+  monthlyRent   Float
+  securityDeposit Float
+  minStay       Int      // in months
+  amenities     String[] // array of amenity strings
+  rules         String
+  description   String
+  photos        String[] // array of photo URLs
+  status        String   @default("pending") // pending, approved, rejected
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([city])
+  @@index([propertyType])
+  @@index([gender])
+  @@map("properties")
+}
+
+model Tenant {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId     String
+  propertyId  String   @db.ObjectId
+  name        String
+  email       String
+  phone       String
+  propertyName String
+  monthlyRent Float
+  moveInDate DateTime
+  status      String   @default("active") // active, inactive
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([propertyId])
+  @@index([status])
+  @@map("tenants")
+}
+
+model Payment {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId     String
+  tenantId    String    @db.ObjectId
+  propertyId  String    @db.ObjectId
+  tenantName  String
+  propertyName String
+  amount      Float
+  dueDate     DateTime
+  paidDate    DateTime?
+  status      String    @default("pending") // pending, paid, overdue
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([ownerId])
+  @@index([tenantId])
+  @@index([propertyId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("payments")
+}
+
+model Activity {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId   String
+  type      String   // payment, booking, maintenance, tenant
+  message   String
+  amount    Float?
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+
